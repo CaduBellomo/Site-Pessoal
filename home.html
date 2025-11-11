@@ -1,0 +1,232 @@
+```<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrossel de Amigos</title>
+    <style>
+        /* --- 1. CSS: Estilização Geral --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5; /* Fundo cinza claro */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        /* --- 2. CSS: O Contêiner Principal --- */
+        .carousel-container {
+            width: 90%;
+            max-width: 500px; /* Largura do carrossel */
+            background-color: #ffffff; /* Fundo branco */
+            border-radius: 16px; /* Bordas arredondadas */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
+            overflow: hidden; /* Essencial para esconder os slides que não estão ativos */
+            position: relative; /* Necessário para posicionar os botões */
+        }
+
+        /* --- 3. CSS: O Slider (que se move) --- */
+        .carousel-slider {
+            display: flex; /* Coloca os slides lado a lado */
+            /* A mágica do JS vai aqui: transição suave */
+            transition: transform 0.5s ease-in-out;
+        }
+
+        /* --- 4. CSS: Cada Slide --- */
+        .carousel-slide {
+            min-width: 100%; /* Cada slide ocupa 100% do contêiner */
+            box-sizing: border-box;
+            padding: 30px 40px; /* Espaçamento interno */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .carousel-slide img {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px; /* Bordas da imagem */
+            object-fit: cover; /* Garante que a imagem preencha o espaço */
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .carousel-slide h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem; /* Tamanho do nome */
+        }
+
+        .carousel-slide p {
+            font-size: 1rem;
+            color: #555; /* Cor do texto de descrição */
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* --- 5. CSS: Botões de Navegação (Setas) --- */
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%); /* Centraliza verticalmente */
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 50%; /* Botões redondos */
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .carousel-btn:hover {
+            background-color: #fff;
+        }
+
+        .prev {
+            left: 15px;
+        }
+
+        .next {
+            right: 15px;
+        }
+
+        /* --- 6. CSS: Pontos de Paginação --- */
+        .carousel-dots {
+            text-align: center;
+            padding: 15px 0;
+            background-color: #ffffff;
+            border-top: 1px solid #eee;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: #ccc; /* Cor do ponto inativo */
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .dot.active {
+            background-color: #333; /* Cor do ponto ativo */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="carousel-container">
+
+        <div class="carousel-slider">
+
+            <div class="carousel-slide">
+                <img src="https://via.placeholder.com/150/8C9EFF/FFFFFF?text=Gabi" alt="Foto da Gabriela">
+                <h3>Gabriela</h3>
+                <p>Minha irmã mais velha - engraçada, companheira e sempre me ajuda quando preciso.</p>
+            </div>
+
+            <div class="carousel-slide">
+                <img src="https://via.placeholder.com/150/FFB7C5/FFFFFF?text=Caio" alt="Foto do Caio">
+                <h3>Caio</h3>
+                <p>Irmão caçula - adora jogos e faz a casa ficar animada quando chega.</p>
+            </div>
+
+            <div class="carousel-slide">
+                <img src="https://via.placeholder.com/150/A0E7E5/FFFFFF?text=Lucas" alt="Foto do Lucas">
+                <h3>Lucas</h3>
+                <p>Parceiro da escola - sempre tira sarro e tem as melhores ideias para os projetos.</p>
+            </div>
+
+            <div class="carousel-slide">
+                <img src="https://via.placeholder.com/150/B4F8C8/FFFFFF?text=Pedro" alt="Foto do Pedro">
+                <h3>Pedro</h3>
+                <p>Gosta de esportes e viagens - sempre tem histórias de trilhas e passeios.</p>
+            </div>
+
+        </div>
+
+        <button class="carousel-btn prev">&lt;</button>
+        <button class="carousel-btn next">&gt;</button>
+
+        <div class="carousel-dots">
+            </div>
+
+    </div>
+
+    <script>
+        // Seleciona os elementos do DOM
+        const slider = document.querySelector('.carousel-slider');
+        const slides = document.querySelectorAll('.carousel-slide');
+        const prevBtn = document.querySelector('.prev');
+        const nextBtn = document.querySelector('.next');
+        const dotsContainer = document.querySelector('.carousel-dots');
+
+        let currentIndex = 0; // Começa no primeiro slide (índice 0)
+        const totalSlides = slides.length;
+
+        // --- Cria os Pontos de Paginação ---
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('span');
+            dot.classList.add('dot');
+            dot.addEventListener('click', () => {
+                goToSlide(i); // Vai para o slide clicado
+            });
+            dotsContainer.appendChild(dot);
+        }
+
+        const dots = document.querySelectorAll('.dot'); // Seleciona os pontos DEPOIS de criá-los
+
+        // --- Função Principal para Mover o Slide ---
+        function goToSlide(index) {
+            // Verifica os limites (para o carrossel "dar a volta")
+            if (index < 0) {
+                index = totalSlides - 1; // Vai para o último
+            } else if (index >= totalSlides) {
+                index = 0; // Volta para o primeiro
+            }
+
+            // Move o slider usando a propriedade 'transform' do CSS
+            slider.style.transform = `translateX(-${index * 100}%)`;
+            currentIndex = index;
+
+            // Atualiza o ponto ativo
+            updateDots();
+        }
+
+        // --- Função para Atualizar os Pontos ---
+        function updateDots() {
+            dots.forEach((dot, index) => {
+                if (index === currentIndex) {
+                    dot.classList.add('active'); // Adiciona a classe 'active' ao ponto atual
+                } else {
+                    dot.classList.remove('active'); // Remove dos outros
+                }
+            });
+        }
+
+        // --- Event Listeners (Ouvintes de Clique) ---
+        nextBtn.addEventListener('click', () => {
+            goToSlide(currentIndex + 1); // Vai para o próximo slide
+        });
+
+        prevBtn.addEventListener('click', () => {
+            goToSlide(currentIndex - 1); // Vai para o slide anterior
+        });
+
+        // Inicia o carrossel no primeiro slide (define o primeiro ponto como ativo)
+        goToSlide(0);
+
+    </script>
+
+</body>
+</html>```
